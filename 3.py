@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy
 
 ignoreAttributeIndex = [1, 2, 5, 6, 8, 10, 12, 12]
+usedAttrNum = 6
 class Cluster(object):
     def __init__(self, centroid):
         self.centroid = centroid
@@ -29,6 +30,7 @@ class Cluster(object):
         return score
 
 def connectToClusters(dataset, clusters, isManhattan):
+    print("Connect to clusters--------------------------------------------")
     for entry in dataset:
         minDistance = 9999999.99
         resultCentroidIndex = 0
@@ -38,10 +40,15 @@ def connectToClusters(dataset, clusters, isManhattan):
                 minDistance = dist
                 resultCentroidIndex = index
         clusters[resultCentroidIndex].addEntry(entry)
-
+    print(clusters)
 def changeClustersWithData(clusters):
+    print("\nchangeClustersWithData++++++++++++++++++++++++++++++++++++++++")
+    
     for idx, cluster in enumerate(clusters):
-        newMeanCentroid = [0, 0, 0, 0]
+        print(clusters[2].members)
+        newMeanCentroid = []
+        for i in range(usedAttrNum):
+            newMeanCentroid.append(0)
         for entry in cluster.members:
             for index, val in enumerate(entry):
                 newMeanCentroid[index] += val/len(cluster.members)
@@ -66,6 +73,10 @@ def changeMembersWithNewClusters(clusters, isManhattan):
     return numOfChanges
 
 def distance(first, second, isManhattan):
+    # print("Run distance function for caculating the distance+++++++++++++++++++++++++++++++")
+    # print(first)
+    # print(second)
+    print("Dang tinh distance.....")
     result = 0
     if isManhattan:
         for index, val in enumerate(first):
@@ -81,11 +92,11 @@ def read_arff(inputFile):
     resultArr = []
     headers = []
     data = []
-    resultData = []
     f = open(inputFile, "r")
     contents = f.read()
     file_as_list = contents.splitlines()
     handle_converting_csv(file_as_list, headers, data)
+    resultData = data
     #age, blood-pressure, cholesterol, maximum-heart-rate, peak, colored-vessels
     entryLength = len(data[0])
     for i in range(len(data)):
@@ -129,21 +140,14 @@ def generateRandomCentroids(dataset, k):
     return clusters
 
 def main():
-    # inputFile = sys.argv[1]
-    # outputFile = sys.argv[2]
-    # kNumber = int(sys.argv[3])
+    inputFile = sys.argv[1]
+    outputFile = sys.argv[2]
+    kNumber = int(sys.argv[3])
+    print(sys.argv)
 
-    inputFile = "cardiology-cleaned.arff"
-    outputFile = "abc.txt"
-    kNumber = 3
-
-    print("Cac tham so da nhap:\n")
-    print("Input:\n")
-    print(inputFile)
-    print("Output:\n")
-    print(outputFile)
-    print("Kmean:\n")
-    print(kNumber)
+    # inputFile = "cardiology-cleaned.arff"
+    # kNumber = 3
+    # outputFile = "abc.txt"
 
     resultArr, headers, data = read_arff(inputFile)
 
@@ -157,76 +161,17 @@ def main():
     connectToClusters(data, clusters, isManhattan)
     changeClustersWithData(clusters)
     while changeMembersWithNewClusters(clusters, isManhattan) != 0:
-            changeClustersWithData(clusters)
+        changeClustersWithData(clusters)
     totalScore = 0
+    output = open(str(kNumber)+"-"+outputFile, "w")
     for index, cluster in enumerate(clusters):
-            totalScore += cluster.getWCScore(isManhattan)
+        totalScore += cluster.getWCScore(isManhattan)
     print("WC-SSE=" + str(totalScore))
+    output.write("WC-SSE=" + str(totalScore) + "\n")
     for index, cluster in enumerate(clusters):
         print("Centroid" + str(index + 1) + "=" + str(cluster.centroid))
+        output.write("Centroid" + str(index + 1) + "=" + str(cluster.centroid) + "\n")
+    output.close()
 
-
-    # if clusteringOption == 2:
-    #     dataset = loggedLoadCsv(sys.argv[1])
-    # elif clusteringOption == 3:
-    #     dataset = standardizedLoadCsv(sys.argv[1])
-    # else:
-    #     dataset = loadCsv(sys.argv[1]) #argv1
-
-    # clusters = generateRandomCentroids(dataset, kNumber)
-    # if clusteringOption == 1:
-    #     isManhattan = False
-    #     connectToClusters(dataset, clusters, isManhattan)
-
-    #     changeClustersWithData(clusters)
-    #     while changeMembersWithNewClusters(clusters, isManhattan) != 0:
-    #         changeClustersWithData(clusters)
-
-    #     totalScore = 0
-    #     for index, cluster in enumerate(clusters):
-    #         totalScore += cluster.getWCScore(isManhattan)
-    #     print "WC-SSE=" + str(totalScore)
-
-    #     for index, cluster in enumerate(clusters):
-    #         print "Centroid" + str(index + 1) + "=" + str(cluster.centroid)
-    # elif clusteringOption == 4:
-    #     isManhattan = True
-    #     connectToClusters(dataset, clusters, isManhattan)
-
-    #     changeClustersWithData(clusters)
-    #     while changeMembersWithNewClusters(clusters, isManhattan) != 0:
-    #         changeClustersWithData(clusters)
-
-    #     totalScore = 0
-    #     for index, cluster in enumerate(clusters):
-    #         totalScore += cluster.getWCScore(isManhattan)
-    #     print "WC-SSE=" + str(totalScore)
-
-    #     for index, cluster in enumerate(clusters):
-    #         print "Centroid" + str(index + 1) + "=" + str(cluster.centroid)
-    # elif clusteringOption == 5:
-    #     percentNum = int(len(dataset) * 0.01)
-    #     downSampled = random.sample(dataset, percentNum)
-
-    #     clusters = generateRandomCentroids(downSampled, kNumber)
-    #     isManhattan = False
-    #     connectToClusters(downSampled, clusters, isManhattan)
-
-    #     changeClustersWithData(clusters)
-    #     while changeMembersWithNewClusters(clusters, isManhattan) != 0:
-    #         changeClustersWithData(clusters)
-
-    #     totalScore = 0
-    #     for index, cluster in enumerate(clusters):
-    #         totalScore += cluster.getWCScore(isManhattan)
-    #     print "WC-SSE=" + str(totalScore)
-
-    #     for index, cluster in enumerate(clusters):
-    #         print "Centroid" + str(index + 1) + "=" + str(cluster.centroid)
-
-    # if plotOption == "1":
-    #     plotLat(clusters, False)
-    # if plotOption == "2":
-    #     plotLat(clusters, True)
-
+#Example: python 3.py cardiology-cleaned.arff clusters.txt 3
 main()
