@@ -40,12 +40,10 @@ def connectToClusters(dataset, clusters, isManhattan):
                 minDistance = dist
                 resultCentroidIndex = index
         clusters[resultCentroidIndex].addEntry(entry)
-    print(clusters)
+
 def changeClustersWithData(clusters):
-    print("\nchangeClustersWithData++++++++++++++++++++++++++++++++++++++++")
     
     for idx, cluster in enumerate(clusters):
-        print(clusters[2].members)
         newMeanCentroid = []
         for i in range(usedAttrNum):
             newMeanCentroid.append(0)
@@ -76,7 +74,6 @@ def distance(first, second, isManhattan):
     # print("Run distance function for caculating the distance+++++++++++++++++++++++++++++++")
     # print(first)
     # print(second)
-    print("Dang tinh distance.....")
     result = 0
     if isManhattan:
         for index, val in enumerate(first):
@@ -105,13 +102,6 @@ def read_arff(inputFile):
         for index, val in enumerate(data[i]):
             resultData[i][index] = float(val)
     
-    # print("Result: ")
-    # print(resultArr)
-    # print("headers: ")
-    # print(headers)
-    print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++data: ")
-    print(resultData)
-    print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++")
     return resultArr, headers, resultData
 
 def handle_converting_csv(arffDataList, headers, data):
@@ -166,12 +156,19 @@ def main():
     output = open(str(kNumber)+"-"+outputFile, "w")
     for index, cluster in enumerate(clusters):
         totalScore += cluster.getWCScore(isManhattan)
-    print("WC-SSE=" + str(totalScore))
-    output.write("WC-SSE=" + str(totalScore) + "\n")
+    print("kMeans")
+    print("=======")
+    output.write("kMeans\n")
+    output.write("=======\n")
+    print("Within cluster sum of squared errors: "+str(totalScore))
+    output.write("Within cluster sum of squared errors: "+str(totalScore) + "\n")
+    print("Cluster centroids:")
+    output.write("Cluster centroids:\n")
+    output.write("Within cluster sum of squared errors: "+str(totalScore) + "\n")
     for index, cluster in enumerate(clusters):
         print("Centroid" + str(index + 1) + "=" + str(cluster.centroid))
         output.write("Centroid" + str(index + 1) + "=" + str(cluster.centroid) + "\n")
     output.close()
 
-#Example: python 3.py cardiology-cleaned.arff clusters.txt 3
+#python 3.py cardiology-cleaned.arff clusters.txt 3
 main()
